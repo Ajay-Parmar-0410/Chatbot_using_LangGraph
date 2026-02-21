@@ -1,0 +1,8 @@
+*.ipynb
+.ipynb_checkpoints/
+*.db
+*.shm
+*.wal
+myenv/
+__pycache__/
+.env
