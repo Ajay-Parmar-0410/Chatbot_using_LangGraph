@@ -49,11 +49,3 @@ Save it.
 
 ---
 
-## Step 3️⃣ Upload to GitHub
-
-Run:
-
-```powershell
-git add README.md
-git commit -m "Add README file"
-git push
