@@ -1,0 +1,272 @@
+/* ============================================
+   AI Chatbot - Custom Styles
+   ============================================ */
+
+/* --- Base & Theme Transitions --- */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+/* --- Sidebar Animations --- */
+.sidebar-visible {
+    transform: translateX(0);
+}
+.sidebar-hidden {
+    transform: translateX(-100%);
+    position: absolute;
+}
+
+aside {
+    transition: transform 0.25s ease;
+}
+
+/* --- Message Animations --- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-bubble {
+    animation: fadeInUp 0.3s ease forwards;
+}
+
+/* --- Typing Indicator --- */
+@keyframes bounce {
+    0%, 60%, 100% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-8px);
+    }
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    animation: bounce 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+/* --- Textarea Auto-resize --- */
+#user-input {
+    min-height: 24px;
+    line-height: 1.5;
+}
+
+/* --- Code Block Styling --- */
+.message-content pre {
+    border-radius: 8px;
+    margin: 8px 0;
+    overflow-x: auto;
+    position: relative;
+}
+
+.message-content pre code {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.message-content code:not(pre code) {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.875em;
+}
+
+.dark .message-content code:not(pre code) {
+    background-color: #374151;
+}
+
+.message-content code:not(pre code) {
+    background-color: #f3f4f6;
+}
+
+/* --- Code Block Copy Button --- */
+.code-copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    background: rgba(255, 255, 255, 0.1);
+    color: #d1d5db;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.message-content pre:hover .code-copy-btn {
+    opacity: 1;
+}
+
+.code-copy-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Message Actions --- */
+.message-actions {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.message-group:hover .message-actions {
+    opacity: 1;
+}
+
+/* --- Thread Item --- */
+.thread-item {
+    transition: background-color 0.15s ease;
+}
+
+.thread-item.active {
+    background-color: #e5e7eb;
+}
+
+.dark .thread-item.active {
+    background-color: #333333;
+}
+
+.thread-item .thread-delete {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.thread-item:hover .thread-delete {
+    opacity: 1;
+}
+
+/* --- Welcome Screen --- */
+.suggestion-card {
+    transition: all 0.2s ease;
+}
+
+.suggestion-card:hover {
+    transform: translateY(-2px);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    #sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        z-index: 40;
+    }
+
+    .sidebar-hidden {
+        transform: translateX(-100%);
+    }
+
+    #messages {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    #sidebar {
+        width: 240px;
+    }
+}
+
+/* --- Markdown Content Styling --- */
+.message-content h1,
+.message-content h2,
+.message-content h3 {
+    font-weight: 600;
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.message-content h1 { font-size: 1.25rem; }
+.message-content h2 { font-size: 1.125rem; }
+.message-content h3 { font-size: 1rem; }
+
+.message-content p {
+    margin-bottom: 8px;
+    line-height: 1.7;
+}
+
+.message-content ul,
+.message-content ol {
+    margin-left: 1.5rem;
+    margin-bottom: 8px;
+}
+
+.message-content ul { list-style-type: disc; }
+.message-content ol { list-style-type: decimal; }
+
+.message-content li {
+    margin-bottom: 4px;
+    line-height: 1.6;
+}
+
+.message-content blockquote {
+    border-left: 3px solid #6366f1;
+    padding-left: 12px;
+    margin: 8px 0;
+    color: #6b7280;
+}
+
+.message-content table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    width: 100%;
+}
+
+.message-content th,
+.message-content td {
+    border: 1px solid #e5e7eb;
+    padding: 6px 12px;
+    text-align: left;
+}
+
+.dark .message-content th,
+.dark .message-content td {
+    border-color: #333333;
+}
+
+.message-content th {
+    font-weight: 600;
+}
+
+/* --- Sidebar overlay for mobile --- */
+#sidebar-overlay {
+    transition: opacity 0.25s ease;
+}

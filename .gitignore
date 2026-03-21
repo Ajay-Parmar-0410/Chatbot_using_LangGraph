@@ -1,8 +1,14 @@
 *.ipynb
 .ipynb_checkpoints/
 *.db
-*.shm
-*.wal
+*.db-shm
+*.db-wal
+*.db-*
+*.bin
 myenv/
 __pycache__/
 .env
+.claude/
+uvicorn.log
+Plan.md
+CLAUDE.md

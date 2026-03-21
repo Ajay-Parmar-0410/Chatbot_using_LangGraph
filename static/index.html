@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        surface: { light: '#f7f8fc', dark: '#2a2a2a' },
+                        accent: { light: '#6366f1', dark: '#818cf8' },
+                    }
+                }
+            }
+        };
+    </script>
+
+    <!-- highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-dark">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" id="hljs-light" disabled>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- marked.js -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- DOMPurify -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body class="bg-white dark:bg-[#171717] text-[#2c2c36] dark:text-[#fafafc] h-screen overflow-hidden">
+
+    <div class="flex h-screen">
+
+        <!-- ==================== SIDEBAR ==================== -->
+        <aside id="sidebar" class="sidebar-visible w-[280px] flex-shrink-0 bg-[#f9fafb] dark:bg-[#1e1e1e] border-r border-[#e5e7eb] dark:border-[#333333] flex flex-col h-screen z-30">
+
+            <!-- Sidebar Header -->
+            <div class="flex items-center justify-between p-4 border-b border-[#e5e7eb] dark:border-[#333333]">
+                <button id="new-chat-btn" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#6366f1] dark:bg-[#4f46e5] text-white text-sm font-medium hover:opacity-90 transition-opacity">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    New Chat
+                </button>
+                <button id="sidebar-close-btn" class="p-2 rounded-lg hover:bg-[#e5e7eb] dark:hover:bg-[#333333] transition-colors">
+                    <i data-lucide="panel-left-close" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Search -->
+            <div class="p-3">
+                <div class="relative">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b7280] dark:text-[#9ca3af]"></i>
+                    <input id="search-input" type="text" placeholder="Search conversations..."
+                        class="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-white dark:bg-[#2a2a2a] border border-[#e5e7eb] dark:border-[#333333] focus:outline-none focus:ring-2 focus:ring-[#6366f1] dark:focus:ring-[#818cf8] placeholder-[#9ca3af]">
+                </div>
+            </div>
+
+            <!-- Thread List -->
+            <div id="thread-list" class="flex-1 overflow-y-auto px-2 pb-4">
+                <!-- Dynamically populated -->
+            </div>
+        </aside>
+
+        <!-- ==================== MAIN CONTENT ==================== -->
+        <main id="main-content" class="flex-1 flex flex-col min-w-0 h-screen">
+
+            <!-- Navbar -->
+            <header id="navbar" class="flex items-center justify-between px-4 py-3 border-b border-[#e5e7eb] dark:border-[#333333] bg-white/80 dark:bg-[#171717]/80 backdrop-blur-sm">
+                <div class="flex items-center gap-3">
+                    <button id="sidebar-open-btn" class="p-2 rounded-lg hover:bg-[#f3f4f6] dark:hover:bg-[#333333] transition-colors hidden">
+                        <i data-lucide="panel-left-open" class="w-5 h-5"></i>
+                    </button>
+                    <h1 id="app-title" class="text-lg font-semibold">AI Chatbot</h1>
+                </div>
+                <button id="theme-toggle" class="p-2 rounded-lg hover:bg-[#f3f4f6] dark:hover:bg-[#333333] transition-colors" title="Toggle theme">
+                    <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                </button>
+            </header>
+
+            <!-- Welcome Screen -->
+            <div id="welcome-screen" class="flex-1 flex flex-col items-center justify-center px-4">
+                <div class="text-center max-w-lg">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#6366f1] to-[#818cf8] flex items-center justify-center">
+                        <i data-lucide="bot" class="w-10 h-10 text-white"></i>
+                    </div>
+                    <h2 class="text-2xl font-semibold mb-2">Hi! I'm your AI Assistant</h2>
+                    <p class="text-[#6b7280] dark:text-[#9ca3af] mb-8">How can I help you today?</p>
+
+                    <div id="suggestion-cards" class="grid grid-cols-2 gap-3 max-w-md mx-auto">
+                        <button class="suggestion-card group p-4 rounded-xl border border-[#e5e7eb] dark:border-[#333333] hover:border-[#6366f1] dark:hover:border-[#818cf8] bg-white dark:bg-[#2a2a2a] text-left transition-all hover:shadow-md"
+                                data-prompt="Write a Python function to sort a list using quicksort">
+                            <i data-lucide="code" class="w-5 h-5 mb-2 text-[#6366f1] dark:text-[#818cf8]"></i>
+                            <p class="text-sm font-medium">Write Code</p>
+                            <p class="text-xs text-[#6b7280] dark:text-[#9ca3af] mt-1">Python quicksort function</p>
+                        </button>
+                        <button class="suggestion-card group p-4 rounded-xl border border-[#e5e7eb] dark:border-[#333333] hover:border-[#6366f1] dark:hover:border-[#818cf8] bg-white dark:bg-[#2a2a2a] text-left transition-all hover:shadow-md"
+                                data-prompt="What are the latest tech news today?">
+                            <i data-lucide="search" class="w-5 h-5 mb-2 text-[#6366f1] dark:text-[#818cf8]"></i>
+                            <p class="text-sm font-medium">Search the Web</p>
+                            <p class="text-xs text-[#6b7280] dark:text-[#9ca3af] mt-1">Latest tech news</p>
+                        </button>
+                        <button class="suggestion-card group p-4 rounded-xl border border-[#e5e7eb] dark:border-[#333333] hover:border-[#6366f1] dark:hover:border-[#818cf8] bg-white dark:bg-[#2a2a2a] text-left transition-all hover:shadow-md"
+                                data-prompt="What is 15% of 2500?">
+                            <i data-lucide="calculator" class="w-5 h-5 mb-2 text-[#6366f1] dark:text-[#818cf8]"></i>
+                            <p class="text-sm font-medium">Calculate</p>
+                            <p class="text-xs text-[#6b7280] dark:text-[#9ca3af] mt-1">Quick math</p>
+                        </button>
+                        <button class="suggestion-card group p-4 rounded-xl border border-[#e5e7eb] dark:border-[#333333] hover:border-[#6366f1] dark:hover:border-[#818cf8] bg-white dark:bg-[#2a2a2a] text-left transition-all hover:shadow-md"
+                                data-prompt="What is the current price of AAPL?">
+                            <i data-lucide="trending-up" class="w-5 h-5 mb-2 text-[#6366f1] dark:text-[#818cf8]"></i>
+                            <p class="text-sm font-medium">Stock Price</p>
+                            <p class="text-xs text-[#6b7280] dark:text-[#9ca3af] mt-1">Check AAPL price</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Container (hidden when welcome screen is visible) -->
+            <div id="chat-container" class="flex-1 overflow-y-auto hidden">
+                <div id="messages" class="max-w-[720px] mx-auto px-4 py-6 space-y-6">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <footer id="input-area" class="border-t border-[#e5e7eb] dark:border-[#333333] bg-white dark:bg-[#171717] px-4 py-4">
+                <div class="max-w-[720px] mx-auto">
+                    <div id="input-wrapper" class="flex items-end gap-2 bg-[#f7f8fc] dark:bg-[#2a2a2a] border border-[#e5e7eb] dark:border-[#333333] rounded-2xl px-4 py-3 focus-within:ring-2 focus-within:ring-[#6366f1] dark:focus-within:ring-[#818cf8] transition-shadow">
+                        <textarea id="user-input" placeholder="Ask me anything..." rows="1"
+                            class="flex-1 bg-transparent resize-none outline-none text-[15px] leading-relaxed max-h-[200px] placeholder-[#9ca3af]"></textarea>
+                        <button id="send-btn" disabled
+                            class="flex-shrink-0 w-9 h-9 rounded-lg bg-[#6366f1] dark:bg-[#4f46e5] text-white flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity">
+                            <i data-lucide="arrow-up" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-center text-[#9ca3af] mt-2">AI can make mistakes. Verify important information.</p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- JS Modules -->
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/markdown.js"></script>
+    <script src="/static/js/chat.js"></script>
+    <script src="/static/js/sidebar.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
