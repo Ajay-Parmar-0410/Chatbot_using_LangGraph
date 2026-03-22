@@ -46,7 +46,7 @@ const Chat = {
                 throw new Error(`HTTP ${response.status}`);
             }
 
-            // Remove typing indicator, create assistant bubble only after fetch succeeds
+            // Remove typing indicator, create assistant bubble
             typingEl.remove();
             assistantEl = this._createAssistantBubble();
 
@@ -85,8 +85,9 @@ const Chat = {
             }
         } catch (err) {
             if (typingEl.parentNode) typingEl.remove();
+            console.error('[Chat] Stream error:', err);
             if (!assistantEl) assistantEl = this._createAssistantBubble();
-            fullResponse = `Sorry, something went wrong: ${err.message}`;
+            fullResponse = 'Sorry, something went wrong. Please try again.';
             this._updateAssistantBubble(assistantEl, fullResponse);
         }
 
@@ -117,7 +118,7 @@ const Chat = {
         const lastUserMsg = [...App.state.messages].reverse().find((m) => m.role === 'user');
         if (!lastUserMsg) return;
 
-        // Remove the last assistant message from state (immutable) and DOM
+        // Remove the last assistant message (immutable)
         if (App.state.messages.length > 0 && App.state.messages[App.state.messages.length - 1].role === 'assistant') {
             App.state.messages = App.state.messages.slice(0, -1);
         }
@@ -127,7 +128,6 @@ const Chat = {
             lastGroup.remove();
         }
 
-        // Re-send the last user message
         App.state.isStreaming = false;
         await this.sendMessage(lastUserMsg.content);
     },
@@ -173,7 +173,7 @@ const Chat = {
         group.className = 'message-group flex justify-end';
         group.dataset.role = 'user';
         group.innerHTML = `
-            <div class="message-bubble max-w-[80%] px-4 py-3 rounded-2xl rounded-br-sm bg-[#6366f1] dark:bg-[#4f46e5] text-white">
+            <div class="message-bubble user-bubble max-w-[80%] px-4 py-3 text-white">
                 <p class="text-[15px] leading-relaxed whitespace-pre-wrap">${Utils.escapeHtml(content)}</p>
             </div>
         `;
@@ -191,13 +191,12 @@ const Chat = {
                 <i data-lucide="bot" class="w-4 h-4 text-white"></i>
             </div>
             <div class="flex-1 min-w-0">
-                <div class="message-bubble message-content text-[15px] leading-relaxed bg-[#f3f4f6] dark:bg-[#2a2a2a] rounded-2xl rounded-tl-sm px-4 py-3 inline-block max-w-full">
+                <div class="message-bubble message-content ai-bubble text-[15px] leading-relaxed rounded-2xl px-4 py-3 inline-block max-w-full">
                 </div>
                 <div class="message-actions mt-1 flex gap-1"></div>
             </div>
         `;
         messagesEl.appendChild(group);
-        // Re-initialize Lucide icons for the new bot avatar
         if (typeof lucide !== 'undefined') lucide.createIcons();
         return group;
     },
@@ -251,7 +250,7 @@ const Chat = {
             <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#6366f1] to-[#818cf8] flex items-center justify-center">
                 <i data-lucide="bot" class="w-4 h-4 text-white"></i>
             </div>
-            <div class="flex items-center gap-1.5 px-4 py-3 rounded-2xl bg-[#f3f4f6] dark:bg-[#2a2a2a]">
+            <div class="flex items-center gap-1.5 px-4 py-3">
                 <span class="typing-dot bg-[#6b7280]"></span>
                 <span class="typing-dot bg-[#6b7280]"></span>
                 <span class="typing-dot bg-[#6b7280]"></span>

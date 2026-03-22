@@ -25,6 +25,16 @@ const Markdown = {
             breaks: true,
             gfm: true,
         });
+
+        // DOMPurify hook: enforce noopener on _blank links
+        if (typeof DOMPurify !== 'undefined') {
+            DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+                if (node.tagName === 'A') {
+                    node.setAttribute('target', '_blank');
+                    node.setAttribute('rel', 'noopener noreferrer');
+                }
+            });
+        }
     },
 
     /**
@@ -47,6 +57,7 @@ const Markdown = {
 
         return DOMPurify.sanitize(html, {
             ALLOWED_ATTR: ['class', 'href', 'src', 'alt', 'title', 'target', 'rel'],
+            ALLOWED_URI_REGEXP: /^(?:https?|mailto):/i,
             FORCE_BODY: true,
         });
     },
@@ -57,6 +68,9 @@ const Markdown = {
     addCodeCopyButtons(container) {
         const blocks = container.querySelectorAll('pre');
         blocks.forEach((pre) => {
+            // Guard: don't add duplicate buttons
+            if (pre.querySelector('.code-copy-btn')) return;
+
             pre.style.position = 'relative';
             const btn = document.createElement('button');
             btn.className = 'code-copy-btn';

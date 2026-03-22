@@ -8,21 +8,20 @@ The user will never notice a key switch.
 
 import os
 import logging
-import requests
 import sqlite3
 
 from dotenv import load_dotenv
 load_dotenv()
 
-from langchain_core.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph.message import add_messages
 from langgraph.graph import StateGraph, END, START
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.prebuilt import ToolNode, tools_condition
 from typing import TypedDict, Annotated
-from langchain_community.utilities import GoogleSerperAPIWrapper
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
+
+from tools import all_tools
 
 logger = logging.getLogger(__name__)
 
@@ -70,76 +69,10 @@ llm = _llm_primary
 
 
 # ---------------------------------------------------------------------------
-# Tools (same as original backend)
+# Tools — imported from tools/ package
 # ---------------------------------------------------------------------------
 
-@tool
-def web_search(query: str) -> str:
-    """
-    Search the web for latest or real-time information using Google Serper.
-    """
-    try:
-        search = GoogleSerperAPIWrapper()
-        result = search.run(query)
-        return result
-    except Exception as e:
-        return f"Error during web search: {str(e)}"
-
-
-@tool
-def calculator(first_num: float, second_num: float, operation: str) -> dict:
-    """
-    Perform a basic arithmetic operation on two numbers.
-    Supported operations: add, sub, mul, div
-    """
-    try:
-        if operation == "add":
-            result = first_num + second_num
-        elif operation == "sub":
-            result = first_num - second_num
-        elif operation == "mul":
-            result = first_num * second_num
-        elif operation == "div":
-            if second_num == 0:
-                return {"error": "Division by zero is not allowed"}
-            result = first_num / second_num
-        else:
-            return {"error": f"Unsupported operation '{operation}'"}
-        return {"result": result}
-    except Exception as e:
-        return {"error": str(e)}
-
-
-@tool
-def get_stock_price(symbol: str) -> dict:
-    """
-    Get the latest stock price for a given stock symbol using Alpha Vantage.
-    Example symbols: AAPL, TSLA, MSFT, GOOGL
-    """
-    api_key = os.getenv("ALPHA_VANTAGE_API_KEY", "GFHDFHBHXA3FQOGJ")
-    url = "https://www.alphavantage.co/query"
-    params = {
-        "function": "GLOBAL_QUOTE",
-        "symbol": symbol,
-        "apikey": api_key,
-    }
-    try:
-        response = requests.get(url, params=params, timeout=10)
-        data = response.json()
-        if "Global Quote" not in data or not data["Global Quote"]:
-            return {"error": f"No data found for symbol '{symbol}'"}
-        quote = data["Global Quote"]
-        return {
-            "symbol": quote.get("01. symbol"),
-            "price": float(quote.get("05. price")),
-            "change": float(quote.get("09. change")),
-            "change_percent": quote.get("10. change percent"),
-        }
-    except Exception as e:
-        return {"error": str(e)}
-
-
-tools = [web_search, calculator, get_stock_price]
+tools = all_tools
 
 
 # ---------------------------------------------------------------------------

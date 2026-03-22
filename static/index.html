@@ -15,6 +15,9 @@
                     colors: {
                         surface: { light: '#f7f8fc', dark: '#2a2a2a' },
                         accent: { light: '#6366f1', dark: '#818cf8' },
+                        sidebar: { light: '#f9fafb', dark: '#1e1e1e' },
+                        hover: { light: '#f3f4f6', dark: '#333333' },
+                        border: { light: '#e5e7eb', dark: '#3a3a3a' },
                     }
                 }
             }
@@ -43,87 +46,76 @@
     <div class="flex h-screen">
 
         <!-- ==================== SIDEBAR ==================== -->
-        <aside id="sidebar" class="sidebar-visible w-[280px] flex-shrink-0 bg-[#f9fafb] dark:bg-[#1e1e1e] border-r border-[#e5e7eb] dark:border-[#333333] flex flex-col h-screen z-30">
+        <aside id="sidebar" class="flex flex-shrink-0 h-screen z-30">
 
-            <!-- Sidebar Header -->
-            <div class="flex items-center justify-between p-4 border-b border-[#e5e7eb] dark:border-[#333333]">
-                <button id="new-chat-btn" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#6366f1] dark:bg-[#4f46e5] text-white text-sm font-medium hover:opacity-90 transition-opacity">
-                    <i data-lucide="plus" class="w-4 h-4"></i>
-                    New Chat
+            <!-- Icon Strip (always visible on desktop) -->
+            <div id="sidebar-icons" class="w-[50px] bg-[#f9fafb] dark:bg-[#1e1e1e] border-r border-[#e5e7eb] dark:border-[#3a3a3a] flex flex-col items-center py-3 gap-1">
+                <!-- Top icons -->
+                <button id="sidebar-toggle-btn" class="sidebar-icon-btn" title="Toggle sidebar" aria-label="Toggle sidebar">
+                    <i data-lucide="panel-left" class="w-5 h-5"></i>
                 </button>
-                <button id="sidebar-close-btn" class="p-2 rounded-lg hover:bg-[#e5e7eb] dark:hover:bg-[#333333] transition-colors">
-                    <i data-lucide="panel-left-close" class="w-5 h-5"></i>
+                <button id="new-chat-btn" class="sidebar-icon-btn" title="New chat" aria-label="New chat">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
                 </button>
-            </div>
+                <button id="search-toggle-btn" class="sidebar-icon-btn" title="Search chats" aria-label="Search chats">
+                    <i data-lucide="search" class="w-5 h-5"></i>
+                </button>
 
-            <!-- Search -->
-            <div class="p-3">
-                <div class="relative">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b7280] dark:text-[#9ca3af]"></i>
-                    <input id="search-input" type="text" placeholder="Search conversations..."
-                        class="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-white dark:bg-[#2a2a2a] border border-[#e5e7eb] dark:border-[#333333] focus:outline-none focus:ring-2 focus:ring-[#6366f1] dark:focus:ring-[#818cf8] placeholder-[#9ca3af]">
+                <!-- Spacer -->
+                <div class="flex-1"></div>
+
+                <!-- Bottom icons -->
+                <button id="theme-toggle" class="sidebar-icon-btn" title="Toggle theme" aria-label="Toggle theme">
+                    <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                </button>
+                <div id="user-avatar" class="w-8 h-8 rounded-full bg-gradient-to-br from-[#6366f1] to-[#818cf8] flex items-center justify-center cursor-pointer mt-1" title="User">
+                    <i data-lucide="user" class="w-4 h-4 text-white"></i>
                 </div>
             </div>
 
-            <!-- Thread List -->
-            <div id="thread-list" class="flex-1 overflow-y-auto px-2 pb-4">
-                <!-- Dynamically populated -->
+            <!-- Expanded Panel -->
+            <div id="sidebar-panel" class="w-[230px] bg-[#f9fafb] dark:bg-[#1e1e1e] border-r border-[#e5e7eb] dark:border-[#3a3a3a] flex flex-col h-screen overflow-hidden">
+
+                <!-- Panel Header -->
+                <div class="flex items-center gap-2 px-4 py-4">
+                    <span class="text-base font-semibold">AI Chatbot</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-[#9ca3af]"></i>
+                </div>
+
+                <!-- Search -->
+                <div class="px-3 pb-2">
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b7280] dark:text-[#9ca3af]"></i>
+                        <input id="search-input" type="text" placeholder="Search conversations..." aria-label="Search conversations"
+                            class="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-white dark:bg-[#2a2a2a] border border-[#e5e7eb] dark:border-[#3a3a3a] focus:outline-none focus:ring-2 focus:ring-[#6366f1] dark:focus:ring-[#818cf8] placeholder-[#9ca3af]">
+                    </div>
+                </div>
+
+                <!-- Thread List -->
+                <div id="thread-list" class="flex-1 overflow-y-auto px-2 pb-4">
+                    <!-- Dynamically populated -->
+                </div>
             </div>
         </aside>
 
         <!-- ==================== MAIN CONTENT ==================== -->
-        <main id="main-content" class="flex-1 flex flex-col min-w-0 h-screen">
+        <main id="main-content" class="flex-1 flex flex-col min-w-0 h-screen relative">
 
-            <!-- Navbar -->
-            <header id="navbar" class="flex items-center justify-between px-4 py-3 border-b border-[#e5e7eb] dark:border-[#333333] bg-white/80 dark:bg-[#171717]/80 backdrop-blur-sm">
-                <div class="flex items-center gap-3">
-                    <button id="sidebar-open-btn" class="p-2 rounded-lg hover:bg-[#f3f4f6] dark:hover:bg-[#333333] transition-colors hidden">
-                        <i data-lucide="panel-left-open" class="w-5 h-5"></i>
-                    </button>
-                    <h1 id="app-title" class="text-lg font-semibold">AI Chatbot</h1>
-                </div>
-                <button id="theme-toggle" class="p-2 rounded-lg hover:bg-[#f3f4f6] dark:hover:bg-[#333333] transition-colors" title="Toggle theme">
-                    <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
-                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
-                </button>
-            </header>
+            <!-- Mobile hamburger (hidden on desktop) -->
+            <button id="mobile-menu-btn" class="hidden absolute top-3 left-3 z-10 p-2 rounded-lg hover:bg-[#f3f4f6] dark:hover:bg-[#333333] transition-colors" aria-label="Open menu">
+                <i data-lucide="menu" class="w-5 h-5"></i>
+            </button>
+
+            <!-- Floating model name (visible when sidebar collapsed) -->
+            <div id="model-label" class="hidden absolute top-3 left-16 z-10">
+                <span class="text-base font-semibold text-[#2c2c36] dark:text-[#fafafc]">AI Chatbot</span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-[#9ca3af] inline-block ml-1"></i>
+            </div>
 
             <!-- Welcome Screen -->
             <div id="welcome-screen" class="flex-1 flex flex-col items-center justify-center px-4">
-                <div class="text-center max-w-lg">
-                    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#6366f1] to-[#818cf8] flex items-center justify-center">
-                        <i data-lucide="bot" class="w-10 h-10 text-white"></i>
-                    </div>
-                    <h2 class="text-2xl font-semibold mb-2">Hi! I'm your AI Assistant</h2>
-                    <p class="text-[#6b7280] dark:text-[#9ca3af] mb-8">How can I help you today?</p>
-
-                    <div id="suggestion-cards" class="grid grid-cols-2 gap-3 max-w-md mx-auto">
-                        <button class="suggestion-card group p-4 rounded-xl border border-[#e5e7eb] dark:border-[#333333] hover:border-[#6366f1] dark:hover:border-[#818cf8] bg-white dark:bg-[#2a2a2a] text-left transition-all hover:shadow-md"
-                                data-prompt="Write a Python function to sort a list using quicksort">
-                            <i data-lucide="code" class="w-5 h-5 mb-2 text-[#6366f1] dark:text-[#818cf8]"></i>
-                            <p class="text-sm font-medium">Write Code</p>
-                            <p class="text-xs text-[#6b7280] dark:text-[#9ca3af] mt-1">Python quicksort function</p>
-                        </button>
-                        <button class="suggestion-card group p-4 rounded-xl border border-[#e5e7eb] dark:border-[#333333] hover:border-[#6366f1] dark:hover:border-[#818cf8] bg-white dark:bg-[#2a2a2a] text-left transition-all hover:shadow-md"
-                                data-prompt="What are the latest tech news today?">
-                            <i data-lucide="search" class="w-5 h-5 mb-2 text-[#6366f1] dark:text-[#818cf8]"></i>
-                            <p class="text-sm font-medium">Search the Web</p>
-                            <p class="text-xs text-[#6b7280] dark:text-[#9ca3af] mt-1">Latest tech news</p>
-                        </button>
-                        <button class="suggestion-card group p-4 rounded-xl border border-[#e5e7eb] dark:border-[#333333] hover:border-[#6366f1] dark:hover:border-[#818cf8] bg-white dark:bg-[#2a2a2a] text-left transition-all hover:shadow-md"
-                                data-prompt="What is 15% of 2500?">
-                            <i data-lucide="calculator" class="w-5 h-5 mb-2 text-[#6366f1] dark:text-[#818cf8]"></i>
-                            <p class="text-sm font-medium">Calculate</p>
-                            <p class="text-xs text-[#6b7280] dark:text-[#9ca3af] mt-1">Quick math</p>
-                        </button>
-                        <button class="suggestion-card group p-4 rounded-xl border border-[#e5e7eb] dark:border-[#333333] hover:border-[#6366f1] dark:hover:border-[#818cf8] bg-white dark:bg-[#2a2a2a] text-left transition-all hover:shadow-md"
-                                data-prompt="What is the current price of AAPL?">
-                            <i data-lucide="trending-up" class="w-5 h-5 mb-2 text-[#6366f1] dark:text-[#818cf8]"></i>
-                            <p class="text-sm font-medium">Stock Price</p>
-                            <p class="text-xs text-[#6b7280] dark:text-[#9ca3af] mt-1">Check AAPL price</p>
-                        </button>
-                    </div>
-                </div>
+                <h1 class="text-4xl md:text-5xl font-bold text-[#2c2c36] dark:text-white">What would you like to explore?</h1>
             </div>
 
             <!-- Chat Container (hidden when welcome screen is visible) -->
@@ -133,20 +125,116 @@
                 </div>
             </div>
 
-            <!-- Input Area -->
-            <footer id="input-area" class="border-t border-[#e5e7eb] dark:border-[#333333] bg-white dark:bg-[#171717] px-4 py-4">
-                <div class="max-w-[720px] mx-auto">
-                    <div id="input-wrapper" class="flex items-end gap-2 bg-[#f7f8fc] dark:bg-[#2a2a2a] border border-[#e5e7eb] dark:border-[#333333] rounded-2xl px-4 py-3 focus-within:ring-2 focus-within:ring-[#6366f1] dark:focus-within:ring-[#818cf8] transition-shadow">
-                        <textarea id="user-input" placeholder="Ask me anything..." rows="1"
+            <!-- Input Area (floating pill) -->
+            <div id="input-area" class="px-4 py-4">
+                <div class="max-w-[700px] mx-auto relative">
+                    <div id="input-wrapper" class="flex items-end gap-2 bg-[#f7f8fc] dark:bg-[#2a2a2a] border border-[#e5e7eb] dark:border-[#3a3a3a] rounded-[28px] px-4 py-3 focus-within:ring-2 focus-within:ring-[#6366f1] dark:focus-within:ring-[#818cf8] transition-shadow">
+                        <!-- + Tools button -->
+                        <button id="tools-btn" class="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#e5e7eb] dark:hover:bg-[#333333] transition-colors" title="Tools" aria-label="Open tools menu" aria-haspopup="true" aria-expanded="false">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                        </button>
+
+                        <!-- Textarea -->
+                        <textarea id="user-input" placeholder="How can I help you today?" rows="1"
                             class="flex-1 bg-transparent resize-none outline-none text-[15px] leading-relaxed max-h-[200px] placeholder-[#9ca3af]"></textarea>
-                        <button id="send-btn" disabled
-                            class="flex-shrink-0 w-9 h-9 rounded-lg bg-[#6366f1] dark:bg-[#4f46e5] text-white flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity">
-                            <i data-lucide="arrow-up" class="w-5 h-5"></i>
+
+                        <!-- Right controls -->
+                        <div class="flex items-center gap-1.5 flex-shrink-0">
+                            <!-- Auto mode dropdown -->
+                            <button id="auto-mode-btn" class="flex items-center gap-1 px-3 py-1.5 rounded-full text-sm text-[#9ca3af] hover:bg-[#e5e7eb] dark:hover:bg-[#333333] transition-colors" aria-label="Select chat mode" aria-haspopup="true" aria-expanded="false">
+                                <span id="mode-label">Auto</span>
+                                <i data-lucide="chevron-down" class="w-3.5 h-3.5 mode-chevron"></i>
+                            </button>
+                            <!-- Mic button -->
+                            <button id="mic-btn" class="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#e5e7eb] dark:hover:bg-[#333333] transition-colors text-[#9ca3af]" title="Voice input">
+                                <i data-lucide="mic" class="w-5 h-5"></i>
+                            </button>
+                            <!-- Send button -->
+                            <button id="send-btn" disabled aria-label="Send message"
+                                class="flex-shrink-0 w-10 h-10 rounded-full bg-[#6366f1] text-white flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity">
+                                <i data-lucide="audio-lines" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tools Dropdown -->
+                    <div id="tools-dropdown" class="dropdown-menu hidden absolute bottom-full left-0 mb-2 w-[240px] bg-white dark:bg-[#2a2a2a] border border-[#e5e7eb] dark:border-[#3a3a3a] rounded-xl shadow-xl py-1 z-50">
+                        <button class="tool-item w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f3f4f6] dark:hover:bg-[#333333] text-left transition-colors">
+                            <i data-lucide="upload" class="w-5 h-5 text-[#9ca3af]"></i>
+                            <div>
+                                <span class="text-sm">Upload attachment</span>
+                                <p class="text-xs text-[#9ca3af]">file, image, video, audio</p>
+                            </div>
+                        </button>
+                        <button class="tool-item w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f3f4f6] dark:hover:bg-[#333333] text-left transition-colors">
+                            <i data-lucide="sparkles" class="w-5 h-5 text-[#9ca3af]"></i>
+                            <span class="text-sm">Deep Research</span>
+                        </button>
+                        <button class="tool-item w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f3f4f6] dark:hover:bg-[#333333] text-left transition-colors">
+                            <i data-lucide="image" class="w-5 h-5 text-[#9ca3af]"></i>
+                            <span class="text-sm">Create Image</span>
+                        </button>
+                        <button class="tool-item w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f3f4f6] dark:hover:bg-[#333333] text-left transition-colors">
+                            <i data-lucide="video" class="w-5 h-5 text-[#9ca3af]"></i>
+                            <span class="text-sm">Create Video</span>
+                        </button>
+                        <button class="tool-item w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f3f4f6] dark:hover:bg-[#333333] text-left transition-colors">
+                            <i data-lucide="code" class="w-5 h-5 text-[#9ca3af]"></i>
+                            <span class="text-sm">Web Dev</span>
+                        </button>
+                        <button class="tool-item w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f3f4f6] dark:hover:bg-[#333333] text-left transition-colors">
+                            <i data-lucide="presentation" class="w-5 h-5 text-[#9ca3af]"></i>
+                            <span class="text-sm">Slides</span>
+                        </button>
+                        <div class="relative">
+                            <button id="more-tools-btn" class="tool-item w-full flex items-center justify-between px-4 py-2.5 hover:bg-[#f3f4f6] dark:hover:bg-[#333333] text-left transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="more-horizontal" class="w-5 h-5 text-[#9ca3af]"></i>
+                                    <span class="text-sm">More</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-[#9ca3af]"></i>
+                            </button>
+                            <!-- More submenu -->
+                            <div id="more-submenu" class="dropdown-menu hidden absolute left-full top-0 ml-1 w-[180px] bg-white dark:bg-[#2a2a2a] border border-[#e5e7eb] dark:border-[#3a3a3a] rounded-xl shadow-xl py-1 z-50">
+                                <button class="tool-item w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f3f4f6] dark:hover:bg-[#333333] text-left transition-colors">
+                                    <i data-lucide="globe" class="w-5 h-5 text-[#9ca3af]"></i>
+                                    <span class="text-sm">Web search</span>
+                                </button>
+                                <button class="tool-item w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f3f4f6] dark:hover:bg-[#333333] text-left transition-colors">
+                                    <i data-lucide="layers" class="w-5 h-5 text-[#9ca3af]"></i>
+                                    <span class="text-sm">Artifacts</span>
+                                </button>
+                                <button class="tool-item w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f3f4f6] dark:hover:bg-[#333333] text-left transition-colors">
+                                    <i data-lucide="layout" class="w-5 h-5 text-[#9ca3af]"></i>
+                                    <span class="text-sm">Layout</span>
+                                </button>
+                                <button class="tool-item w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f3f4f6] dark:hover:bg-[#333333] text-left transition-colors">
+                                    <i data-lucide="map" class="w-5 h-5 text-[#9ca3af]"></i>
+                                    <span class="text-sm">Travel Planner</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode Dropdown -->
+                    <div id="mode-dropdown" class="dropdown-menu hidden absolute bottom-full right-16 mb-2 w-[160px] bg-white dark:bg-[#2a2a2a] border border-[#e5e7eb] dark:border-[#3a3a3a] rounded-xl shadow-xl py-1 z-50">
+                        <button class="mode-option w-full flex items-center justify-between px-4 py-2.5 hover:bg-[#f3f4f6] dark:hover:bg-[#333333] text-left transition-colors" data-mode="auto">
+                            <span class="text-sm">Auto</span>
+                            <i data-lucide="check" class="w-4 h-4 text-[#6366f1] mode-check"></i>
+                        </button>
+                        <button class="mode-option w-full flex items-center justify-between px-4 py-2.5 hover:bg-[#f3f4f6] dark:hover:bg-[#333333] text-left transition-colors" data-mode="thinking">
+                            <span class="text-sm">Thinking</span>
+                            <i data-lucide="check" class="w-4 h-4 text-[#6366f1] mode-check hidden"></i>
+                        </button>
+                        <button class="mode-option w-full flex items-center justify-between px-4 py-2.5 hover:bg-[#f3f4f6] dark:hover:bg-[#333333] text-left transition-colors" data-mode="fast">
+                            <span class="text-sm">Fast</span>
+                            <i data-lucide="check" class="w-4 h-4 text-[#6366f1] mode-check hidden"></i>
                         </button>
                     </div>
+
                     <p class="text-xs text-center text-[#9ca3af] mt-2">AI can make mistakes. Verify important information.</p>
                 </div>
-            </footer>
+            </div>
         </main>
     </div>
 

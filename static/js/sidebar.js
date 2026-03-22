@@ -1,5 +1,5 @@
 /* ============================================
-   Sidebar - Thread History & Search
+   Sidebar - Collapsible Icon Strip + Panel
    ============================================ */
 
 const Sidebar = {
@@ -23,35 +23,94 @@ const Sidebar = {
     },
 
     /**
-     * Toggle sidebar visibility.
+     * Set sidebar mode: 'expanded', 'collapsed', or 'hidden'
+     */
+    setMode(mode) {
+        const sidebar = document.getElementById('sidebar');
+        const modelLabel = document.getElementById('model-label');
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+
+        // Remove all state classes
+        sidebar.classList.remove('sidebar-expanded', 'sidebar-collapsed', 'sidebar-hidden');
+
+        // Apply new state
+        sidebar.classList.add(`sidebar-${mode}`);
+        App.state.sidebarMode = mode;
+
+        // Model label visibility (show when collapsed on desktop)
+        if (modelLabel) {
+            modelLabel.classList.toggle('hidden', mode !== 'collapsed');
+        }
+
+        // Mobile menu button
+        if (mobileBtn) {
+            mobileBtn.classList.toggle('hidden', mode !== 'hidden');
+        }
+
+        // Remove overlay if not mobile-expanded
+        if (mode !== 'expanded' || window.innerWidth >= 769) {
+            this._removeOverlay();
+        }
+
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    },
+
+    /**
+     * Toggle between expanded and collapsed (desktop) or hidden and expanded (mobile).
      */
     toggle() {
-        const sidebar = document.getElementById('sidebar');
-        const openBtn = document.getElementById('sidebar-open-btn');
-        const isVisible = sidebar.classList.contains('sidebar-visible');
+        const current = App.state.sidebarMode;
 
-        if (isVisible) {
-            sidebar.classList.remove('sidebar-visible');
-            sidebar.classList.add('sidebar-hidden');
-            openBtn.classList.remove('hidden');
-            this._removeOverlay();
+        if (window.innerWidth < 769) {
+            // Mobile: hidden <-> expanded (overlay)
+            if (current === 'hidden') {
+                this.setMode('expanded');
+                this._addOverlay();
+            } else {
+                this.setMode('hidden');
+            }
         } else {
-            sidebar.classList.remove('sidebar-hidden');
-            sidebar.classList.add('sidebar-visible');
-            openBtn.classList.add('hidden');
-            if (window.innerWidth < 769) this._addOverlay();
+            // Desktop/tablet: expanded <-> collapsed
+            if (current === 'expanded') {
+                this.setMode('collapsed');
+            } else {
+                this.setMode('expanded');
+            }
         }
     },
 
     // --- Private ---
 
     _bindEvents() {
-        const closeBtn = document.getElementById('sidebar-close-btn');
-        const openBtn = document.getElementById('sidebar-open-btn');
+        const toggleBtn = document.getElementById('sidebar-toggle-btn');
+        const newChatBtn = document.getElementById('new-chat-btn');
+        const searchToggleBtn = document.getElementById('search-toggle-btn');
+        const mobileBtn = document.getElementById('mobile-menu-btn');
         const searchInput = document.getElementById('search-input');
 
-        if (closeBtn) closeBtn.addEventListener('click', () => this.toggle());
-        if (openBtn) openBtn.addEventListener('click', () => this.toggle());
+        if (toggleBtn) toggleBtn.addEventListener('click', () => this.toggle());
+        if (mobileBtn) mobileBtn.addEventListener('click', () => this.toggle());
+
+        if (newChatBtn) {
+            newChatBtn.addEventListener('click', () => {
+                Chat.clearChat();
+                document.getElementById('user-input').focus();
+            });
+        }
+
+        if (searchToggleBtn) {
+            searchToggleBtn.addEventListener('click', () => {
+                // If collapsed, expand first
+                if (App.state.sidebarMode === 'collapsed') {
+                    this.setMode('expanded');
+                }
+                // Focus search input
+                setTimeout(() => {
+                    const input = document.getElementById('search-input');
+                    if (input) input.focus();
+                }, 300);
+            });
+        }
 
         if (searchInput) {
             searchInput.addEventListener(
@@ -85,9 +144,10 @@ const Sidebar = {
 
             const section = document.createElement('div');
             section.className = 'mb-3';
-            section.innerHTML = `
-                <p class="text-xs font-medium text-[#6b7280] dark:text-[#9ca3af] px-3 py-1.5 uppercase tracking-wider">${groupName}</p>
-            `;
+            const label = document.createElement('p');
+            label.className = 'text-xs font-medium text-[#6b7280] dark:text-[#9ca3af] px-3 py-1.5 uppercase tracking-wider';
+            label.textContent = groupName;
+            section.appendChild(label);
 
             for (const t of items) {
                 const item = document.createElement('div');
@@ -127,10 +187,10 @@ const Sidebar = {
 
             App.state.currentThreadId = threadId;
             Chat.loadMessages(data.messages || []);
-            this.loadThreads(); // Re-render to update active state
+            this.loadThreads();
 
             // Close sidebar on mobile
-            if (window.innerWidth < 769) this.toggle();
+            if (window.innerWidth < 769) this.setMode('hidden');
         } catch {
             // Fail silently
         }

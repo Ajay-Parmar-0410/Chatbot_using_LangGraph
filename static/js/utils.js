@@ -19,13 +19,15 @@ const Utils = {
 
     /**
      * Group a date into "Today", "Yesterday", "Last 7 Days", or "Older".
+     * Uses calendar-day comparison (not elapsed time).
      */
     dateGroup(dateStr) {
         if (!dateStr) return 'Older';
         const now = new Date();
         const date = new Date(dateStr);
-        const diffMs = now - date;
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const dateStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const diffDays = Math.round((todayStart - dateStart) / (1000 * 60 * 60 * 24));
 
         if (diffDays === 0) return 'Today';
         if (diffDays === 1) return 'Yesterday';

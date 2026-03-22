@@ -1,10 +1,10 @@
 /* ============================================
-   AI Chatbot - Custom Styles
+   AI Chatbot - Qwen-Style UI
    ============================================ */
 
 /* --- Base & Theme Transitions --- */
 * {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 body {
@@ -26,24 +26,114 @@ body {
     background: #666;
 }
 
-/* --- Sidebar Animations --- */
-.sidebar-visible {
-    transform: translateX(0);
-}
-.sidebar-hidden {
-    transform: translateX(-100%);
-    position: absolute;
+/* ==================== SIDEBAR ==================== */
+
+/* Icon strip buttons */
+.sidebar-icon-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    transition: background-color 0.15s ease;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: inherit;
 }
 
-aside {
-    transition: transform 0.25s ease;
+.sidebar-icon-btn:hover {
+    background-color: #e5e7eb;
 }
 
-/* --- Message Animations --- */
+.dark .sidebar-icon-btn:hover {
+    background-color: #333333;
+}
+
+/* Sidebar panel slide animation */
+#sidebar-panel {
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.2s ease;
+}
+
+#sidebar-panel.panel-collapsed {
+    width: 0;
+    opacity: 0;
+    overflow: hidden;
+    border-right: none;
+    padding: 0;
+}
+
+/* Sidebar states */
+#sidebar.sidebar-expanded #sidebar-panel {
+    width: 230px;
+    opacity: 1;
+}
+
+#sidebar.sidebar-collapsed #sidebar-panel {
+    width: 0;
+    opacity: 0;
+    overflow: hidden;
+    border-right: none;
+}
+
+#sidebar.sidebar-hidden {
+    display: none;
+}
+
+/* Main content transition for sidebar */
+#main-content {
+    transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==================== INPUT BAR ==================== */
+
+#input-area {
+    background: transparent;
+}
+
+#input-wrapper {
+    position: relative;
+}
+
+/* Textarea */
+#user-input {
+    min-height: 24px;
+    line-height: 1.5;
+}
+
+/* ==================== DROPDOWNS ==================== */
+
+.dropdown-menu {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+    pointer-events: none;
+    transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+}
+
+.dropdown-menu.dropdown-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* Mode chevron flip */
+.mode-chevron {
+    transition: transform 0.2s ease;
+}
+
+.mode-chevron.chevron-up {
+    transform: rotate(180deg);
+}
+
+/* ==================== MESSAGES ==================== */
+
+/* Message fade-in */
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(6px);
     }
     to {
         opacity: 1;
@@ -52,10 +142,40 @@ aside {
 }
 
 .message-bubble {
-    animation: fadeInUp 0.3s ease forwards;
+    animation: fadeInUp 0.25s ease forwards;
 }
 
-/* --- Typing Indicator --- */
+/* AI bubble: transparent bg in dark mode */
+.ai-bubble {
+    background-color: #f3f4f6;
+}
+
+.dark .ai-bubble {
+    background-color: transparent;
+}
+
+/* User bubble: uniform pill */
+.user-bubble {
+    background-color: #6366f1;
+    border-radius: 1rem;
+}
+
+.dark .user-bubble {
+    background-color: #4f46e5;
+}
+
+/* Message Actions */
+.message-actions {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.message-group:hover .message-actions {
+    opacity: 1;
+}
+
+/* ==================== TYPING INDICATOR ==================== */
+
 @keyframes bounce {
     0%, 60%, 100% {
         transform: translateY(0);
@@ -81,13 +201,31 @@ aside {
     animation-delay: 0.4s;
 }
 
-/* --- Textarea Auto-resize --- */
-#user-input {
-    min-height: 24px;
-    line-height: 1.5;
+/* ==================== THREAD ITEMS ==================== */
+
+.thread-item {
+    transition: background-color 0.15s ease;
 }
 
-/* --- Code Block Styling --- */
+.thread-item.active {
+    background-color: #e5e7eb;
+}
+
+.dark .thread-item.active {
+    background-color: #333333;
+}
+
+.thread-item .thread-delete {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.thread-item:hover .thread-delete {
+    opacity: 1;
+}
+
+/* ==================== CODE BLOCKS ==================== */
+
 .message-content pre {
     border-radius: 8px;
     margin: 8px 0;
@@ -104,17 +242,14 @@ aside {
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 0.875em;
+    background-color: #f3f4f6;
 }
 
 .dark .message-content code:not(pre code) {
     background-color: #374151;
 }
 
-.message-content code:not(pre code) {
-    background-color: #f3f4f6;
-}
-
-/* --- Code Block Copy Button --- */
+/* Code copy button */
 .code-copy-btn {
     position: absolute;
     top: 8px;
@@ -138,74 +273,8 @@ aside {
     background: rgba(255, 255, 255, 0.2);
 }
 
-/* --- Message Actions --- */
-.message-actions {
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
+/* ==================== MARKDOWN CONTENT ==================== */
 
-.message-group:hover .message-actions {
-    opacity: 1;
-}
-
-/* --- Thread Item --- */
-.thread-item {
-    transition: background-color 0.15s ease;
-}
-
-.thread-item.active {
-    background-color: #e5e7eb;
-}
-
-.dark .thread-item.active {
-    background-color: #333333;
-}
-
-.thread-item .thread-delete {
-    opacity: 0;
-    transition: opacity 0.15s ease;
-}
-
-.thread-item:hover .thread-delete {
-    opacity: 1;
-}
-
-/* --- Welcome Screen --- */
-.suggestion-card {
-    transition: all 0.2s ease;
-}
-
-.suggestion-card:hover {
-    transform: translateY(-2px);
-}
-
-/* --- Responsive --- */
-@media (max-width: 768px) {
-    #sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        height: 100vh;
-        z-index: 40;
-    }
-
-    .sidebar-hidden {
-        transform: translateX(-100%);
-    }
-
-    #messages {
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-    #sidebar {
-        width: 240px;
-    }
-}
-
-/* --- Markdown Content Styling --- */
 .message-content h1,
 .message-content h2,
 .message-content h3 {
@@ -259,14 +328,79 @@ aside {
 
 .dark .message-content th,
 .dark .message-content td {
-    border-color: #333333;
+    border-color: #3a3a3a;
 }
 
 .message-content th {
     font-weight: 600;
 }
 
-/* --- Sidebar overlay for mobile --- */
+/* ==================== RESPONSIVE ==================== */
+
+/* Mobile */
+@media (max-width: 768px) {
+    #sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        z-index: 40;
+    }
+
+    #sidebar-icons {
+        display: none;
+    }
+
+    #sidebar.sidebar-hidden {
+        display: none;
+    }
+
+    #sidebar.sidebar-expanded {
+        display: flex;
+    }
+
+    #sidebar.sidebar-expanded #sidebar-panel {
+        width: 280px;
+        opacity: 1;
+    }
+
+    #messages {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    #welcome-screen h1 {
+        font-size: 1.75rem;
+    }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+    #sidebar.sidebar-expanded #sidebar-panel {
+        position: fixed;
+        left: 50px;
+        top: 0;
+        height: 100vh;
+        z-index: 35;
+    }
+
+    #input-wrapper {
+        max-width: 600px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+    #model-label {
+        display: none !important;
+    }
+
+    #sidebar.sidebar-collapsed #model-label {
+        display: block !important;
+    }
+}
+
+/* Sidebar overlay for mobile */
 #sidebar-overlay {
     transition: opacity 0.25s ease;
 }
