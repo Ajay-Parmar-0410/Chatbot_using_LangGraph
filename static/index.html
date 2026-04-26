@@ -92,6 +92,20 @@
                     </div>
                 </div>
 
+                <!-- Memories Panel (long-term memory) -->
+                <div id="memories-section" class="px-2 pb-2 border-b border-[#e5e7eb] dark:border-[#3a3a3a]">
+                    <button id="memories-toggle" class="w-full flex items-center justify-between px-2 py-2 rounded-md hover:bg-[#f3f4f6] dark:hover:bg-[#333333] transition-colors text-left" aria-expanded="false" aria-controls="memories-list">
+                        <span class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-[#6b7280] dark:text-[#9ca3af]">
+                            <i data-lucide="brain" class="w-3.5 h-3.5"></i>
+                            Memories <span id="memories-count" class="text-[#9ca3af]">(0)</span>
+                        </span>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-[#9ca3af] transition-transform" id="memories-chevron"></i>
+                    </button>
+                    <div id="memories-list" class="hidden mt-1 space-y-1 max-h-[200px] overflow-y-auto">
+                        <!-- Populated by memories.js -->
+                    </div>
+                </div>
+
                 <!-- Thread List -->
                 <div id="thread-list" class="flex-1 overflow-y-auto px-2 pb-4">
                     <!-- Dynamically populated -->
@@ -244,6 +258,7 @@
     <script src="/static/js/markdown.js"></script>
     <script src="/static/js/chat.js"></script>
     <script src="/static/js/sidebar.js"></script>
+    <script src="/static/js/memories.js"></script>
     <script src="/static/js/app.js"></script>
 </body>
 </html>

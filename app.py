@@ -20,6 +20,9 @@ from pydantic import BaseModel, Field, validator
 from langchain_core.messages import HumanMessage, AIMessage
 
 from chatbot_backend_gemini import chatbot, checkpointer, llm
+from memory.service import MAX_CONTENT_LEN, VALID_CATEGORIES, get_default_service
+
+DEFAULT_USER_ID = "default"
 
 logger = logging.getLogger(__name__)
 
@@ -229,6 +232,56 @@ async def generate_title(thread_id: str, request: TitleRequest):
         title = request.first_message[:40] + ("..." if len(request.first_message) > 40 else "")
         _thread_titles[thread_id] = title
         return {"title": title}
+
+
+# ---------------------------------------------------------------------------
+# Memory API — long-term memory CRUD
+# ---------------------------------------------------------------------------
+
+class MemoryCreateRequest(BaseModel):
+    content: str = Field(..., min_length=1, max_length=MAX_CONTENT_LEN)
+    category: str = Field(...)
+
+    @validator("category")
+    def _check_category(cls, v):
+        if v not in VALID_CATEGORIES:
+            raise ValueError(f"category must be one of {sorted(VALID_CATEGORIES)}")
+        return v
+
+
+@app.get("/api/memories")
+async def list_memories():
+    """List every long-term memory for the demo user."""
+    svc = get_default_service()
+    items = svc.list_all(user_id=DEFAULT_USER_ID)
+    return {"memories": [m.to_dict() for m in items], "count": len(items)}
+
+
+@app.post("/api/memories")
+async def create_memory(request: MemoryCreateRequest):
+    """Manually save a memory. The model can also save via the save_memory tool."""
+    svc = get_default_service()
+    try:
+        memory_id = svc.save(
+            user_id=DEFAULT_USER_ID,
+            content=request.content,
+            category=request.category,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return {"id": memory_id, "saved": True}
+
+
+@app.delete("/api/memories/{memory_id}")
+async def delete_memory(memory_id: str):
+    """Delete one memory by id (must be a UUID v4)."""
+    if not memory_id or not UUID_RE.match(memory_id):
+        raise HTTPException(status_code=400, detail="Invalid memory_id")
+    svc = get_default_service()
+    deleted = svc.delete(user_id=DEFAULT_USER_ID, memory_id=memory_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Memory not found")
+    return {"success": True}
 
 
 # ---------------------------------------------------------------------------

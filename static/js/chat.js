@@ -73,7 +73,9 @@ const Chat = {
                             fullResponse += event.content;
                             this._updateAssistantBubble(assistantEl, fullResponse);
                         } else if (event.type === 'done') {
-                            // Streaming complete
+                            // Streaming complete — refresh memories panel in case
+                            // the model just called save_memory.
+                            if (window.Memories) Memories.refresh();
                         } else if (event.type === 'error') {
                             fullResponse += `\n\nError: ${event.content}`;
                             this._updateAssistantBubble(assistantEl, fullResponse);

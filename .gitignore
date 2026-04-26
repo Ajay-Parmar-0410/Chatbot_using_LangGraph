@@ -8,7 +8,5 @@
 myenv/
 __pycache__/
 .env
-.claude/
 uvicorn.log
 Plan.md
-CLAUDE.md

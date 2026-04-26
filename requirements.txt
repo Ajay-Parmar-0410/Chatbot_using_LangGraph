@@ -6,9 +6,12 @@ langchain-community
 langchain-google-genai
 langgraph
 langgraph-checkpoint
+langgraph-checkpoint-sqlite
 langgraph-prebuilt
 requests
 google-serper-api-wrapper
 httpx
 trafilatura
 pint
+sentence-transformers
+numpy

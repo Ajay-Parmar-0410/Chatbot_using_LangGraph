@@ -21,6 +21,10 @@ const App = {
         Theme.init();
         Markdown.init();
         Sidebar.init();
+        if (window.Memories) {
+            // Fire-and-forget; failures render inside the panel.
+            Memories.init();
+        }
 
         // Bind UI events
         this._bindInputEvents();
